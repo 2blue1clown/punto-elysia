@@ -72,7 +72,11 @@ interface RoomJoin {
   roomId:string
 }
 
-const app = new Elysia()
+const app = new Elysia({
+    websocket: {
+        idleTimeout: 30
+    }
+})
 .use(cors())
 .ws("/ws",{
   open(ws){
