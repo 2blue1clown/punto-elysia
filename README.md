@@ -20,6 +20,9 @@ The rest of the players make a request to join the specific room. Each room has 
 - send the new connection room information (already connected players and their colors)
 - broadcast to other players in the room that a new player has joined
 
+# Fly.io
+
+The project is deployed using the free tier of fly.io because vercel does not allow long running servers. 
 
 
 # Elysia with Bun runtime
