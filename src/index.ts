@@ -1,6 +1,8 @@
-import { Elysia } from "elysia";
+import { Context, Elysia, t } from "elysia";
 import { cors } from '@elysiajs/cors'
 import Host from "./host";
+import { privateEncrypt } from "crypto";
+import { ServerWebSocket } from "bun";
 
 
 const host = new Host()
@@ -14,6 +16,7 @@ interface WebSocketData {
   channelId: string;
 }
 
+
 const app = new Elysia({
     websocket: {
         idleTimeout: 30
@@ -25,9 +28,10 @@ const app = new Elysia({
   return {roomId:r.id}
 })
 .ws("/join",{
-  message(ws,message){
-    const roomId = (message as RoomJoin).roomId
-    console.log(ws.id, 'is trying to join',roomId)
+  open(ws){
+    const roomId = ws.data.cookie.roomId.value
+    const channelId = ws.data.cookie.channelId.value
+    console.log(channelId, 'is trying to join',roomId)
     const room = host.findRoom(roomId)
     if(room) {
       room.addPlayer(ws)
@@ -35,23 +39,20 @@ const app = new Elysia({
     }
     ws.send({message:'could not join this room, disconnecting'})
     ws.close()
+
   },
+  message(ws,message){},
   close(ws, code, message) {
-    //TODO: need to complete the close logic
-    // console.log('closing connection with ', ws.id)
-    // host.rooms.forEach(r => r.removePlayer(ws))
-
+    const channelId = ws.data.cookie.channelId.value
+    console.log(channelId, ' is closing their connection')
+    host.rooms.forEach(r => r.removePlayer(channelId))
   },
-
+  beforeHandle(context){
+    // console.log('cookie: roomId =',context.cookie.roomId.value)
+  }
 })
-.get("/", (context) => {
-  // console.log(context)
-  return {message:"Hello Elysia"}
-})
-// .listen({port:3000,hostname:'0.0.0.0'});
 .listen({port:process.env.port,hostname:process.env.HOSTNAME});
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
 );
-

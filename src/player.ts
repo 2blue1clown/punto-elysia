@@ -7,6 +7,6 @@ export class Player {
   constructor(ws:ServerSocket,color:Color){
     this.connection = ws
     this.color = color
-    this.id = crypto.randomUUID()
+    this.id = ws.data.cookie.channelId.value
   }
 }

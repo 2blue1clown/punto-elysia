@@ -1,8 +1,10 @@
 import Room from "./room"
+import { ServerSocket } from "./types"
 
 
 export default class Host { 
   rooms:Room[] = []
+  connections:ServerSocket[] = []
   constructor(){}
   
   createRoom(){

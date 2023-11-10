@@ -71,7 +71,7 @@ export default class Room {
   }
 
   sendTo(message:unknown,id:string){
-    console.log('sending to: ',id,JSON.stringify(message))
+    // console.log('sending to: ',id,JSON.stringify(message))
     this.players.find(p => p.id === id)?.connection.send(JSON.stringify(message))
   }
 
