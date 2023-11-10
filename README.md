@@ -5,6 +5,12 @@ websockets, bun and dockers.
 
 # Server endpoints
 
+Room logic
+
+- Server receives a request to make a new room (get)
+- Server makes new room and adds it to the rooms
+
+
 ## newRoom
 
 One of the players in the group will make a request to start a new room.
@@ -15,10 +21,27 @@ We need to:
 
 
 ## joinRoom(id:string)
-The rest of the players make a request to join the specific room. Each room has a maximum of 3 players.
-- open socket
+The rest of the players make a request to join a specific room. Each room has a maximum of 4 players.
+- open socket with client
+- create a unique id for the player (this should maybe get stored in a session somehow??)
 - send the new connection room information (already connected players and their colors)
 - broadcast to other players in the room that a new player has joined
+
+# Events
+
+## PlayerJoin
+- this event will be emitted to all players within a room when a new player joins
+
+## NewGame
+
+# Event Responses
+
+- At this stage I think its a good idea to have all of the messages that come from the server follow a certain 
+format...
+- interface PuntoEvent <T> {
+    type: string
+    data: T
+}
 
 # Fly.io
 
