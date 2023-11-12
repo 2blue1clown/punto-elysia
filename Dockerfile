@@ -13,6 +13,7 @@ COPY tsconfig.json .
 
 ENV NODE_ENV production
 ENV HOSTNAME 0.0.0.0
+ENV CLIENT_URL punto-wznv.vercel.app
 ENV PORT = 3000
 CMD ["bun", "src/index.ts"]
 

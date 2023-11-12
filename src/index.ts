@@ -3,6 +3,7 @@ import { cors } from '@elysiajs/cors'
 import Host from "./host";
 import { privateEncrypt } from "crypto";
 import { ServerWebSocket } from "bun";
+import { cookieToHeader } from "elysia/dist/handler";
 
 
 const host = new Host()
@@ -22,13 +23,24 @@ const app = new Elysia({
         idleTimeout: 30
     }
 })
-.use(cors())
-.get("/create-room",(context)=> {
+.use(cors(
+  {
+    origin:process.env.CLIENT_URL,
+    credentials:true
+  }
+
+))
+.get("/create-room",({cookie:{puntoSession}})=> {
   const r = host.createRoom()
-  return {roomId:r.id}
+  puntoSession.sameSite='none'
+  puntoSession.secure=true
+  // puntoSession.domain=process.env.HOSTNAME
+  puntoSession.value = {...puntoSession.value,roomId:r.id}
+  return 'room created'
 })
 .ws("/join",{
   open(ws){
+    //cookies need to be set on the client side
     const roomId = ws.data.cookie.roomId.value
     const channelId = ws.data.cookie.channelId.value
     console.log(channelId, 'is trying to join',roomId)
