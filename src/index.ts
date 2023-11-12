@@ -1,9 +1,6 @@
 import { Context, Elysia, t } from "elysia";
 import { cors } from '@elysiajs/cors'
 import Host from "./host";
-import { privateEncrypt } from "crypto";
-import { ServerWebSocket } from "bun";
-import { cookieToHeader } from "elysia/dist/handler";
 
 
 const host = new Host()
@@ -30,32 +27,50 @@ const app = new Elysia({
   }
 
 ))
+.get("/session",({cookie:{puntoSession}})=> {
+    puntoSession.sameSite='none'
+    puntoSession.secure=true
+    puntoSession.value = {id:crypto.randomUUID(),room:''}
+    return {message:'session started'}
+
+})
 .get("/create-room",({cookie:{puntoSession}})=> {
   const r = host.createRoom()
-  puntoSession.sameSite='none'
-  puntoSession.secure=true
-  // puntoSession.domain=process.env.HOSTNAME
-  puntoSession.value = {...puntoSession.value,roomId:r.id}
-  return 'room created'
+  console.log('created new room ',r.id)
+  return {room: r.id}
+})
+.get("/join/:room",({params:{room},cookie:{puntoSession}})=> {
+    console.log( 'trying to join',room)
+    puntoSession.sameSite='none'
+    puntoSession.secure=true
+    puntoSession.value = {id:crypto.randomUUID(),room:room}
+    const r= host.findRoom(room)
+    if(r){
+      return {message:'room found'}
+    }
+    return 'room not found'
 })
 .ws("/join",{
   open(ws){
-    //cookies need to be set on the client side
-    const roomId = ws.data.cookie.roomId.value
-    const channelId = ws.data.cookie.channelId.value
-    console.log(channelId, 'is trying to join',roomId)
-    const room = host.findRoom(roomId)
-    if(room) {
-      room.addPlayer(ws)
+    const room = ws.data.cookie.puntoSession.value.room
+    const channelId = ws.data.cookie.puntoSession.value.id
+    console.log(channelId, 'is trying to join',room)
+    const r = host.findRoom(room)
+    if(r) {
+      try{
+      r.addPlayer(ws)
       return
+      } catch(e:any){
+        ws.send({message:`could not join this room becasue ${e.message}`})
+        return
+      }
     }
-    ws.send({message:'could not join this room, disconnecting'})
     ws.close()
 
   },
   message(ws,message){},
   close(ws, code, message) {
-    const channelId = ws.data.cookie.channelId.value
+    const channelId = ws.data.cookie.puntoSession.value.id
     console.log(channelId, ' is closing their connection')
     host.rooms.forEach(r => r.removePlayer(channelId))
   },

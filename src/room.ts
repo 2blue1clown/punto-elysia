@@ -15,12 +15,16 @@ export default class Room {
     if(this.players.length >= 4 && this.availableColors.length > 0){
       throw new Error('room already full')
     }
-    const color = this.availableColors.pop()
+    const color = this.availableColors[this.availableColors.length -1]
     if(!color){
       throw new Error('no available colors')
     }
+    if(!!this.players.find(p => p.id === ws.data.cookie.puntoSession.value.id)){
+      throw new Error('player already in room')
+    }
 
     const newPlayer = new Player(ws,color)
+    this.availableColors.pop()
     this.players.push(newPlayer)
 
     const playerJoinedEvent:PlayerJoinedEvent = {
