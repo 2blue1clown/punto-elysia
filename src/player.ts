@@ -1,12 +1,12 @@
-import { Color, ServerSocket } from "./types"
+import { Color, ServerSocket } from "./types";
 
 export class Player {
-  connection:ServerSocket
-  color: Color
-  id:string
-  constructor(ws:ServerSocket,color:Color){
-    this.connection = ws
-    this.color = color
-    this.id = ws.data.cookie.puntoSession.value.id
+  connection: ServerSocket;
+  color: Color;
+  id: string;
+  constructor(ws: ServerSocket, color: Color) {
+    this.connection = ws;
+    this.color = color;
+    this.id = ws.data.cookie.puntoSession.value.id;
   }
 }

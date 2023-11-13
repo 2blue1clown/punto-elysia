@@ -1,27 +1,25 @@
-import { ServerWebSocket } from "bun"
-import { ElysiaWS } from "elysia/dist/ws"
+import { ServerWebSocket } from "bun";
+import { ElysiaWS } from "elysia/dist/ws";
 
-export type ServerSocket = ElysiaWS<ServerWebSocket<{}>>
+export type ServerSocket = ElysiaWS<ServerWebSocket<{}>>;
 export enum Color {
   RED = "RED",
   BLUE = "BLUE",
   GREEN = "GREEN",
-  YELLOW = "YELLOW"
+  YELLOW = "YELLOW",
 }
-
 
 export interface PuntoEvent<T> {
-  eventType:string
-  data: T
+  eventType: string;
+  data: T;
 }
-export interface GeneralPlayerInfo { 
-  color:Color,
-  id:string
-
+export interface GeneralPlayerInfo {
+  color: Color;
+  id: string;
 }
-export interface PlayerJoinInfo { 
-  roomId: string,
-  players: GeneralPlayerInfo[]
+export interface PlayerJoinInfo {
+  roomId: string;
+  players: GeneralPlayerInfo[];
 }
 
 export interface JoinedInfo {
@@ -34,8 +32,8 @@ export interface JoinedEvent extends PuntoEvent<JoinedInfo> {
 }
 
 export interface PlayerJoinedEvent extends PuntoEvent<PlayerJoinInfo> {
-  eventType : "PLAYER_JOINED"
+  eventType: "PLAYER_JOINED";
 }
 export interface PlayerLeftEvent extends PuntoEvent<PlayerJoinInfo> {
-  eventType: "PLAYER_LEFT"
+  eventType: "PLAYER_LEFT";
 }
