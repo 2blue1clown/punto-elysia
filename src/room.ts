@@ -17,7 +17,7 @@ export default class Room {
     this.id = Math.random().toString(36).substring(2, 6);
   }
 
-  addPlayer(ws: ServerSocket) {
+  addPlayer(id: string, send: Function) {
     if (this.players.length >= 4 && this.availableColors.length > 0) {
       throw new Error("room already full");
     }
@@ -25,13 +25,11 @@ export default class Room {
     if (!color) {
       throw new Error("no available colors");
     }
-    if (
-      !!this.players.find((p) => p.id === ws.data.cookie.puntoSession.value.id)
-    ) {
+    if (!!this.players.find((p) => p.id === id)) {
       throw new Error("player already in room");
     }
 
-    const newPlayer = new Player(ws, color);
+    const newPlayer = new Player(send, id, color);
     this.availableColors.pop();
     this.players.push(newPlayer);
 
@@ -61,7 +59,7 @@ export default class Room {
   removePlayer(id: string) {
     const player = this.players.find((p) => p.id === id);
     if (!player) {
-      console.log("player ", id, " was not in room");
+      console.log("player ", id, " was not in room ", this.id);
       return;
     }
     this.availableColors.push(player.color);
@@ -83,15 +81,13 @@ export default class Room {
 
   sendTo(message: unknown, id: string) {
     // console.log('sending to: ',id,JSON.stringify(message))
-    this.players
-      .find((p) => p.id === id)
-      ?.connection.send(JSON.stringify(message));
+    this.players.find((p) => p.id === id)?.send(message);
   }
 
   broadcast(message: unknown) {
-    console.log("sending all: ", JSON.stringify(message));
+    console.log("sending all: ", message);
     this.players.forEach((p) => {
-      p.connection.send(JSON.stringify(message));
+      p.send(message);
     });
   }
 }

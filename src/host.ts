@@ -13,6 +13,7 @@ export default class Host {
   }
 
   findRoom(id: string) {
+    console.log("rooms: ", this.rooms);
     return this.rooms.find((r) => r.id === id);
   }
 }

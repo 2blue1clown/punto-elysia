@@ -27,6 +27,7 @@ export interface JoinedInfo {
   playerId: string;
   roomId: string;
 }
+
 export interface JoinedEvent extends PuntoEvent<JoinedInfo> {
   eventType: "JOINED";
 }
@@ -36,4 +37,7 @@ export interface PlayerJoinedEvent extends PuntoEvent<PlayerJoinInfo> {
 }
 export interface PlayerLeftEvent extends PuntoEvent<PlayerJoinInfo> {
   eventType: "PLAYER_LEFT";
+}
+export interface StartGameEvent extends PuntoEvent<null> {
+  eventType: "START_GAME";
 }
